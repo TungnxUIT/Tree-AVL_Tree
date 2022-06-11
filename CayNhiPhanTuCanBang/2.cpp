@@ -1,4 +1,7 @@
-﻿#include<iostream>
+﻿//Code có tham khảo
+//Hàm xóa Node vẫn còn lỗi, chưa đúng 100%
+//
+#include<iostream>
 using namespace std;
 #define LH -1 //cây con trái cao hơn
 #define EH 0 //cây con trái bằng cây con phải
@@ -69,7 +72,8 @@ void RL(Tree& T) {
 	}T2->balFactor = EH; T = T2;
 }
 int balanceLeft(Tree& T) {
-	switch (T->balFactor)
+	Node* T1 = T->pLeft;
+	switch (T1->balFactor)
 	{
 	case LH: LL(T); return 2;		//lệch trái của trái
 	case RH: LR(T); return 2;		//lệch phải của trái
@@ -78,7 +82,8 @@ int balanceLeft(Tree& T) {
 	return 0;
 }
 int balanceRight(Tree& T) {
-	switch (T->balFactor)
+	Node* T1 = T->pRight;
+	switch (T1->balFactor)
 	{
 	case LH: RL(T); return 2;		//lệch trái của phải
 	case RH: RR(T); return 2;		//lệch phải của phải
@@ -97,7 +102,7 @@ int insertNode(Tree& T, int x) {
 			{
 			case EH: T->balFactor = LH; return 2;	//res = 1 là sau khi thêm node thì node cha cân bằng
 			case RH: T->balFactor = EH; return 1;	//res = 2 là sau khi thêm node thì node cha bị lệch trái hoặc phải
-			case LH: balanceLeft(T);	return 2;
+			case LH: balanceLeft(T);	return 1;
 			}
 		}
 		else if (x > T->data) {			//thêm phải
@@ -107,7 +112,7 @@ int insertNode(Tree& T, int x) {
 			{
 			case EH: T->balFactor = RH; return 2;
 			case LH: T->balFactor = EH; return 1;
-			case RH: balanceRight(T);	return 2;
+			case RH: balanceRight(T);	return 1;
 			}
 		}
 	}
@@ -129,7 +134,7 @@ int Del2(Tree& p, Tree& T) {		//hàm xóa node có 2 con
 		{
 		case EH: T->balFactor = RH; return 2;
 		case LH: T->balFactor = EH; return 1;
-		case RH: balanceRight(T);	return 2;
+		case RH: return balanceRight(T);
 		}
 	}
 	else if (T->pLeft == NULL) {
@@ -144,16 +149,16 @@ int Delete(Tree& T, int x) {
 	int res;
 	if (T == NULL) return 0;
 	else if (x < T->data) {
-		res = Delete(T->pLeft, x);			// xóa xong node trái thì cây sẽ lệch phía phải, nên ta cần balanceRight
+		res = Delete(T->pLeft, x);			// xóa xong node trái thì cây sẽ lệch phía phải
 		if (res < 2) return res;
 		switch (T->balFactor)
 		{
 		case EH: T->balFactor = RH; return 2;
 		case LH: T->balFactor = EH; return 1;
-		case RH: balanceRight(T);	return 2;
+		case RH: balanceRight(T);	return 1;
 		}
 	}
-	else if (x > T->data) {					// xóa xong node phải thì cây lệch phía trái, nên ta cần balanceLeft
+	else if (x > T->data) {					// xóa xong node phải thì cây lệch phía trái
 		res = Delete(T->pRight, x);
 		if (res < 2) return res;
 		switch (T->balFactor)
@@ -167,11 +172,11 @@ int Delete(Tree& T, int x) {
 		Node* p = T;
 		if (p->pLeft == NULL) {				// xóa xong thì sẽ bị lệch, ta return 2
 			T = T->pRight;
-			return 2;
+			res = 2;
 		}
 		else if (p->pRight == NULL) {
 			T = T->pLeft;
-			return 2;
+			res = 2;
 		}
 		else {
 			res = Del2(p, T->pRight);		// tìm node thế mạng
@@ -179,13 +184,17 @@ int Delete(Tree& T, int x) {
 			switch (T->balFactor)
 			{
 			case EH: T->balFactor = LH; return 1;	
-			case RH: T->balFactor = EH; return 1;
-			case LH: balanceLeft(T);	return 1;
+			case RH: T->balFactor = EH; return 2;
+			case LH: return balanceLeft(T);
 			}
 		}
 		delete p;
 		return res;
 	}
+}
+int level(Tree T) {
+	if (T == NULL) return 0;
+	return 1 + max(level(T->pLeft), level(T->pRight));
 }
 void Output_NLR(Tree T) {
 	if (T == NULL)return;
@@ -209,6 +218,10 @@ int main() {
 		insertNode(T, n);
 		cin >> n;
 	}
-	Delete(T, 10);
+	Delete(T, 11);
+	Delete(T, 18);
+	//Delete(T, 30);
+	//Delete(T, 9);
+	cout << level(T) << "\n";
 	Output_NLR(T);
 }
