@@ -218,10 +218,9 @@ int main() {
 		insertNode(T, n);
 		cin >> n;
 	}
+	Output_NLR(T);
 	Delete(T, 11);
 	Delete(T, 18);
-	//Delete(T, 30);
-	//Delete(T, 9);
 	cout << level(T) << "\n";
 	Output_NLR(T);
 }
